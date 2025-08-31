@@ -47,10 +47,10 @@ export function isInDndWindow(nowMin: number, startMin: number, endMin: number):
   if (startMin > endMin) {
     // Example: 22:00-07:00 (1320-420 minutes)
     // Block if: time >= 22:00 OR time <= 07:00
-    return nowMin >= startMin || nowMin <= endMin;
+    return nowMin >= startMin || nowMin < endMin;
   } else {
     // Example: 09:00-17:00 (540-1020 minutes)
     // Block if: 09:00 <= time <= 17:00
-    return nowMin >= startMin && nowMin <= endMin;
+    return nowMin >= startMin && nowMin < endMin;
   }
 } 
