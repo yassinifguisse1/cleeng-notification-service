@@ -2,9 +2,11 @@ import { z } from "zod";
 
 // DND (Do Not Disturb) time window schema
 // Validates HH:MM format (24-hour)
+const timeRegex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+
 export const DndSchema = z.object({
-  start: z.string().regex(/^\d{2}:\d{2}$/, "Expected HH:MM"),
-  end: z.string().regex(/^\d{2}:\d{2}$/, "Expected HH:MM")
+  start: z.string().regex(timeRegex, "start must be HH:MM 00–23:00–59"),
+  end:   z.string().regex(timeRegex, "end must be HH:MM 00–23:00–59"),
 });
 
 // Event setting schema for individual event types
