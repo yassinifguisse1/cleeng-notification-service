@@ -7,6 +7,10 @@
  * Parse HH:MM format to minutes since midnight
  * @param hhmm - Time string in HH:MM format (e.g., "14:30")
  * @returns Minutes since midnight (e.g., 870 for 14:30)
+ * 
+ * Note: This function does not validate input format - validation is handled
+ * by Zod schemas at the API level before reaching this utility function.
+ * Invalid inputs may produce unexpected results (e.g., NaN, values > 1439).
  */
 export function parseHmToMinutes(hhmm: string): number {
   const [hours, minutes] = hhmm.split(':').map(Number);

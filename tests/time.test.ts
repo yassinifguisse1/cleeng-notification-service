@@ -15,6 +15,17 @@ describe("Time Utilities", () => {
       expect(parseHmToMinutes("22:00")).toBe(1320);
       expect(parseHmToMinutes("07:00")).toBe(420);
     });
+
+    test("should handle invalid time inputs gracefully", () => {
+      // Note: Zod validation at API level prevents these from reaching this function
+      // These tests document the function's behavior with invalid inputs
+      expect(parseHmToMinutes("24:00")).toBe(1440); // Invalid hour (should be 0-23)
+      expect(parseHmToMinutes("23:60")).toBe(1440); // Invalid minute (should be 0-59)
+      expect(parseHmToMinutes("25:00")).toBe(1500); // Invalid hour
+      expect(parseHmToMinutes("aa:bb")).toBeNaN();  // Non-numeric input
+      expect(parseHmToMinutes("12:")).toBe(720);    // Missing minutes (treated as 0)
+      expect(parseHmToMinutes(":30")).toBe(30);     // Missing hours (treated as 0)
+    });
   });
   
 
@@ -106,6 +117,22 @@ describe("Time Utilities", () => {
       expect(isInDndWindow(480, nightDndStart, nightDndEnd)).toBe(false); // 08:00
       expect(isInDndWindow(720, nightDndStart, nightDndEnd)).toBe(false); // 12:00
       expect(isInDndWindow(1200, nightDndStart, nightDndEnd)).toBe(false); // 20:00
+    });
+
+    test("should handle boundary assertions explicitly", () => {
+      // Cross-midnight: 22:00 inclusive, 07:00 exclusive
+      expect(isInDndWindow(1320, 1320, 420)).toBe(true);  // 22:00 (start boundary - inclusive)
+      expect(isInDndWindow(420, 1320, 420)).toBe(false);  // 07:00 (end boundary - exclusive)
+      
+      // Same-day: 09:00 inclusive, 17:00 exclusive  
+      expect(isInDndWindow(540, 540, 1020)).toBe(true);   // 09:00 (start boundary - inclusive)
+      expect(isInDndWindow(1020, 540, 1020)).toBe(false); // 17:00 (end boundary - exclusive)
+      
+      // Edge case: one minute before/after boundaries
+      expect(isInDndWindow(1319, 1320, 420)).toBe(false); // 21:59 (before start)
+      expect(isInDndWindow(1321, 1320, 420)).toBe(true);  // 22:01 (after start)
+      expect(isInDndWindow(419, 1320, 420)).toBe(true);   // 06:59 (before end)
+      expect(isInDndWindow(421, 1320, 420)).toBe(false);  // 07:01 (after end)
     });
   });
 });

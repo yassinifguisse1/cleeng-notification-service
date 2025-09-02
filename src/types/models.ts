@@ -2,11 +2,11 @@ import { z } from "zod";
 
 // DND (Do Not Disturb) time window schema
 // Validates HH:MM format (24-hour)
-const timeRegex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+const HHMM = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
 export const DndSchema = z.object({
-  start: z.string().regex(timeRegex, "start must be HH:MM 00–23:00–59"),
-  end:   z.string().regex(timeRegex, "end must be HH:MM 00–23:00–59"),
+  start: z.string().regex(HHMM, "dnd.start must be HH:MM in 24h format"),
+  end:   z.string().regex(HHMM, "dnd.end must be HH:MM in 24h format"),
 });
 
 // Event setting schema for individual event types
@@ -24,12 +24,11 @@ export const PreferencesSchema = z.object({
 // Incoming event schema for POST /events
 // Validates the event payload
 export const IncomingEventSchema = z.object({
-  eventId: z.string(),
-  userId: z.string(),
-  eventType: z.string(),
-  timestamp: z.string().datetime() // ISO 8601 format validation
+  eventId: z.string().min(1),
+  userId: z.string().min(1),
+  eventType: z.string().min(1),
+  timestamp: z.string().datetime(), // ISO 8601 (e.g. 2025-08-30T23:30:00Z)
 });
-
 // TypeScript types inferred from Zod schemas
 export type Preferences = z.infer<typeof PreferencesSchema>;
 export type Event = z.infer<typeof IncomingEventSchema>;
